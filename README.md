@@ -4,52 +4,6 @@ This project includes a Node.js application with MongoDB and Redis services. Red
 
 The `cache.js` module modified the default behaviour of the Mongoose exec function to hook into any queries throughout the application and run caching logic in a centralized place.
 
-## Up and Running
-
-```sh
-npm i
-docker-compose up
-```
-
-## Sample Requests
-
-```bash
-# Getting the blogs for user: 6693cc6d7a9129a0bdaf2ffb
-
-# First time it serves from db,
-# then it will be cached in redis,
-# until a new blog created for this user
-curl http://localhost:3000/blogs/6693cc6d7a9129a0bdaf2ffb
-
-# Create new blog for user: 6693cc6d7a9129a0bdaf2ffb
-curl -X POST \
-  http://localhost:3000/blogs \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "user": "6693cc6d7a9129a0bdaf2ffb",
-    "title": "Checking Cache",
-    "content": "Checking cache invalidation"
-  }'
-
-# Get all blogs (doesn't use any cache)
-curl http://localhost:3000/blogs
-
-```
-
-## Services
-
-### Node.js Application
-
-The Node.js application runs using Node.js version 18.
-
-### MongoDB
-
-MongoDB instance running the xenial version.
-
-### Redis
-
-Redis server using the redis-stack-server image.
-
 ## 🕸️ Snippets
 
 <details>
@@ -144,6 +98,52 @@ async function addNewBlog(blog) {
 ```
 
 </details>
+
+## Services
+
+### Node.js Application
+
+The Node.js application runs using Node.js version 18.
+
+### MongoDB
+
+MongoDB instance running the xenial version.
+
+### Redis
+
+Redis server using the redis-stack-server image.
+
+## Up and Running
+
+```sh
+npm i
+docker-compose up
+```
+
+## Sample Requests
+
+```bash
+# Getting the blogs for user: 6693cc6d7a9129a0bdaf2ffb
+
+# First time it serves from db,
+# then it will be cached in redis,
+# until a new blog created for this user
+curl http://localhost:3000/blogs/6693cc6d7a9129a0bdaf2ffb
+
+# Create new blog for user: 6693cc6d7a9129a0bdaf2ffb
+curl -X POST \
+  http://localhost:3000/blogs \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "user": "6693cc6d7a9129a0bdaf2ffb",
+    "title": "Checking Cache",
+    "content": "Checking cache invalidation"
+  }'
+
+# Get all blogs (doesn't use any cache)
+curl http://localhost:3000/blogs
+
+```
 
 ## Useful Commands(Redis)
 
