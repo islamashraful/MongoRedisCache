@@ -1,6 +1,8 @@
-# Caching NodeJS App with Redis
+# MongoRedisCache
 
-This project includes a Node.js application with MongoDB and Redis services.
+This project includes a Node.js application with MongoDB and Redis services. Redis is used as a caching layer on top of Mongo.
+
+The `cache.js` module modified the default behaviour of the Mongoose exec function to hook into any queries throughout the application and run caching logic in a centralized place.
 
 ## Up and Running
 
@@ -47,6 +49,101 @@ MongoDB instance running the xenial version.
 ### Redis
 
 Redis server using the redis-stack-server image.
+
+## 🕸️ Snippets
+
+<details>
+<summary><code>src/services/cache.js</code></summary>
+
+```js
+const redis = require("redis");
+const mongoose = require("mongoose");
+
+const exec = mongoose.Query.prototype.exec;
+
+let redisClient;
+
+async function getRedisClient() {
+  if (redisClient) return;
+
+  return redis
+    .createClient({
+      url: "redis://redis:6379",
+    })
+    .on("error", (err) => console.log("Redis Client Error", err))
+    .connect();
+}
+
+mongoose.Query.prototype.cache = function (options = {}) {
+  this.useCache = true;
+  this.hashKey = JSON.stringify(options.key || "default");
+
+  return this;
+};
+
+mongoose.Query.prototype.exec = async function () {
+  if (!this.useCache) {
+    return exec.apply(this, arguments);
+  }
+
+  if (!redisClient) {
+    redisClient = await getRedisClient();
+  }
+
+  const redisKey = JSON.stringify({
+    ...this.getQuery(),
+    ...{ collection: this.mongooseCollection.name },
+  });
+
+  const cachedValue = await redisClient.hGet(this.hashKey, redisKey);
+  if (cachedValue) {
+    console.log("serving from cache");
+    const doc = JSON.parse(cachedValue);
+
+    return Array.isArray
+      ? doc.map((item) => new this.model(item))
+      : new this.model(doc);
+  }
+
+  const result = await exec.apply(this, arguments);
+  console.log("serving from DB");
+  redisClient.hSet(this.hashKey, redisKey, JSON.stringify(result));
+  return result;
+};
+
+module.exports = {
+  async clearCache(hashKey) {
+    if (!redisClient) {
+      redisClient = await getRedisClient();
+    }
+
+    redisClient.del(JSON.stringify(hashKey));
+  },
+};
+```
+
+</details>
+<details>
+<summary><code>src/models/blogs.model.js</code></summary>
+
+```js
+async function getAllBlogsByUser(userId) {
+  return await blogs
+    .find({
+      user: userId,
+    })
+    .cache({ key: userId });
+}
+
+async function addNewBlog(blog) {
+  const newBlog = new blogs(blog);
+  await newBlog.save();
+
+  clearCache(blog.user);
+}
+```
+
+</details>
 
 ## Useful Commands(Redis)
 
