@@ -1,15 +1,10 @@
 const express = require("express");
 
-const {
-  httpGetAllBlogs,
-  httpGetAllBlogsByUser,
-  httpAddNewBlog,
-} = require("./blogs.controller");
+const { httpGetBlogs, httpAddNewBlog } = require("./blogs.controller");
 
-const blogsRouter = express.Router();
+const blogsRouter = express.Router({ mergeParams: true });
 
-blogsRouter.get("/", httpGetAllBlogs);
-blogsRouter.get("/:userId", httpGetAllBlogsByUser);
+blogsRouter.get("/", httpGetBlogs);
 blogsRouter.post("/", httpAddNewBlog);
 
 module.exports = blogsRouter;

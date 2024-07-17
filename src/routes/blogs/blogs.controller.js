@@ -5,12 +5,15 @@ const {
 } = require("../../models/blogs.model");
 const { existsUserWithId } = require("../../models/users.model");
 
-async function httpGetAllBlogs(req, res) {
-  res.status(200).send(await getAllBlogs());
-}
-
-async function httpGetAllBlogsByUser(req, res) {
-  res.status(200).send(await getAllBlogsByUser(req.params.userId));
+// @desc    Get blogs
+// @route   GET /blogs
+// @route   GET /blogs/:userId
+async function httpGetBlogs(req, res) {
+  if (req.params.userId) {
+    res.status(200).send(await getAllBlogsByUser(req.params.userId));
+  } else {
+    res.status(200).json(await getAllBlogs());
+  }
 }
 
 async function httpAddNewBlog(req, res) {
@@ -35,7 +38,6 @@ async function httpAddNewBlog(req, res) {
 }
 
 module.exports = {
-  httpGetAllBlogs,
-  httpGetAllBlogsByUser,
+  httpGetBlogs,
   httpAddNewBlog,
 };
