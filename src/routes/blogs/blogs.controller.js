@@ -2,8 +2,8 @@ const {
   getAllBlogs,
   getAllBlogsByUser,
   addNewBlog,
-} = require("../models/blogs.model");
-const { existsUserWithId } = require("../models/users.model");
+} = require("../../models/blogs.model");
+const { existsUserWithId } = require("../../models/users.model");
 
 async function httpGetAllBlogs(req, res) {
   res.status(200).send(await getAllBlogs());

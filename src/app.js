@@ -1,5 +1,5 @@
 const express = require("express");
-const blogsRouter = require("./routes/blogs.router");
+const blogsRouter = require("./routes/blogs/blogs.router");
 
 const app = express();
 
