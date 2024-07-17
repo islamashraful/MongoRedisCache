@@ -128,14 +128,13 @@ docker-compose up
 # First time it serves from db,
 # then it will be cached in redis,
 # until a new blog created for this user
-curl http://localhost:3000/blogs/6693cc6d7a9129a0bdaf2ffb
+curl http://localhost:3000/users/6693cc6d7a9129a0bdaf2ffb/blogs
 
 # Create new blog for user: 6693cc6d7a9129a0bdaf2ffb
 curl -X POST \
-  http://localhost:3000/blogs \
+  http://localhost:3000/users/6693cc6d7a9129a0bdaf2ffb/blogs \
   -H 'Content-Type: application/json' \
   -d '{
-    "user": "6693cc6d7a9129a0bdaf2ffb",
     "title": "Checking Cache",
     "content": "Checking cache invalidation"
   }'
