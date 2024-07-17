@@ -17,7 +17,9 @@ async function httpGetBlogs(req, res) {
 }
 
 async function httpAddNewBlog(req, res) {
-  const { title, content, user } = req.body;
+  const user = req.params.userId;
+  const { title, content } = req.body;
+
   if (!title || !content || !user) {
     return res.status(400).json({
       error: "Missing required blog property",
